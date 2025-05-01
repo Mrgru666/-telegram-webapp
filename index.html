@@ -67,27 +67,176 @@
       location.reload();
     }
 
-    async function startScanner() {
-      const reader = document.getElementById("reader");
-      reader.style.display = "block";
-
-      const devices = await Html5Qrcode.getCameras();
-      if (devices.length > 0) {
-        const cameraId = devices[0].id;
-        const qr = new Html5Qrcode("reader");
-
-        qr.start(
-          cameraId,
-          { fps: 10, qrbox: 250 },
-          decodedText => {
-            document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
-            window.open(decodedText, "_blank");
-            qr.stop();
-          },
-          error => {}
-        );
-      }
+    <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Оплата услуг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
     }
-  </script>
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: #30a14e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #228c3a;
+    }
+    #reader {
+      margin-top: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Оплата услуг</h1>
+
+  <button id="pay-btn" onclick="pay()">💳 Оплатить</button>
+  <button onclick="reload()">🔄 Обновить WebApp</button>
+  <button onclick="startScanner()">📸 Оплатить по QR</button>
+
+  <div id="reader"></div>
+  <p id="result"></p>
+
+  <script>
+    Telegram.WebApp.ready();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const amount = urlParams.get("amount") || "500";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("pay-btn");
+      if (btn) {
+        btn.textContent = `💳 Оплатить ${amount} ₽`;
+      }
+    });
+
+    function pay() {
+      const payUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Оплата+услуг&default-sum=${amount}&button-text=11&payment-type-choice=on&account=4100119123765834`;
+      window.open(payUrl, "_blank");
+    }
+
+    function reload() {
+      location.reload();
+    }
+
+    <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Оплата услуг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: #30a14e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #228c3a;
+    }
+    #reader {
+      margin-top: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Оплата услуг</h1>
+
+  <button id="pay-btn" onclick="pay()">💳 Оплатить</button>
+  <button onclick="reload()">🔄 Обновить WebApp</button>
+  <button onclick="startScanner()">📸 Оплатить по QR</button>
+
+  <div id="reader"></div>
+  <p id="result"></p>
+
+  <script>
+    Telegram.WebApp.ready();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const amount = urlParams.get("amount") || "500";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("pay-btn");
+      if (btn) {
+        btn.textContent = `💳 Оплатить ${amount} ₽`;
+      }
+    });
+
+    function pay() {
+      const payUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Оплата+услуг&default-sum=${amount}&button-text=11&payment-type-choice=on&account=4100119123765834`;
+      window.open(payUrl, "_blank");
+    }
+
+    function reload() {
+      location.reload();
+    }
+
+    <script>
+  async function startScanner() {
+    const reader = document.getElementById("reader");
+    reader.style.display = "block";
+
+    const devices = await Html5Qrcode.getCameras();
+    if (!devices || devices.length === 0) {
+      alert("Камера не найдена");
+      return;
+    }
+
+    const backCam = devices.find(d =>
+      d.label.toLowerCase().includes("back") ||
+      d.label.toLowerCase().includes("rear") ||
+      d.label.toLowerCase().includes("environment")
+    ) || devices[0];
+
+    const qr = new Html5Qrcode("reader");
+
+    qr.start(
+      backCam.id,
+      { fps: 10, qrbox: 250 },
+      decodedText => {
+        document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
+        window.open(decodedText, "_blank");
+        qr.stop();
+      },
+      error => {
+        // Ошибки можно не выводить
+      }
+    );
+  }
+</script>
 </body>
 </html>
