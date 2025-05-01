@@ -11,7 +11,7 @@
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
-      background-color: #f2f2f2;
+      background-color: #f9f9f9;
     }
     button {
       font-size: 18px;
@@ -24,7 +24,7 @@
       cursor: pointer;
     }
     button:hover {
-      background-color: #21843d;
+      background-color: #228c3a;
     }
     #reader {
       margin-top: 20px;
@@ -36,12 +36,11 @@
 </head>
 <body>
   <h1>Аренда кемпинга</h1>
-
   <button onclick="pay()">💳 Оплатить 500 ₽</button>
 
-  <h2>Или отсканируйте QR-код:</h2>
+  <h2 style="margin-top: 40px;">Или отсканируйте QR-код:</h2>
   <div id="reader"></div>
-  <p id="scan-result"></p>
+  <p id="result"></p>
 
   <script>
     Telegram.WebApp.ready();
@@ -49,30 +48,35 @@
     function pay() {
       const payUrl = "https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Аренда+кемпинга&default-sum=500&button-text=11&payment-type-choice=on&account=4100119123765834";
       window.open(payUrl, "_blank");
-      // Telegram.WebApp.close(); // можешь вернуть, если нужно закрытие
     }
 
     async function startScanner() {
       const devices = await Html5Qrcode.getCameras();
-      if (devices && devices.length > 0) {
-        const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
-        const html5Qr = new Html5Qrcode("reader");
-
-        html5Qr.start(
-          backCam.id,
-          { fps: 10, qrbox: 250 },
-          (decodedText, decodedResult) => {
-            document.getElementById("scan-result").innerText = "📦 QR найден: " + decodedText;
-            window.open(decodedText, "_blank");
-            html5Qr.stop();
-          },
-          errorMessage => {
-            // Можно логировать ошибки при сканировании
-          }
-        );
-      } else {
-        alert("Камера не найдена");
+      if (!devices || devices.length === 0) {
+        alert("Камеры не найдены");
+        return;
       }
+
+      const backCamera = devices.find(d =>
+        d.label.toLowerCase().includes("back") ||
+        d.label.toLowerCase().includes("rear") ||
+        d.label.toLowerCase().includes("environment")
+      ) || devices[0];
+
+      const qr = new Html5Qrcode("reader");
+
+      qr.start(
+        backCamera.id,
+        { fps: 10, qrbox: 250 },
+        decodedText => {
+          document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
+          window.open(decodedText, "_blank");
+          qr.stop();
+        },
+        error => {
+          // Ошибки сканирования можно логировать
+        }
+      );
     }
 
     startScanner();
