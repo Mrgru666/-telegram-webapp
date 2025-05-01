@@ -5,6 +5,7 @@
   <title>Оплата услуг</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -22,8 +23,11 @@
       border-radius: 10px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #228c3a;
+    #reader {
+      margin-top: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
@@ -33,13 +37,16 @@
   <button id="pay-btn" onclick="pay()">💳 Оплатить</button>
   <button onclick="reload()">🔄 Обновить WebApp</button>
 
+  <h2>Или отсканируйте QR-код:</h2>
+  <div id="reader"></div>
+  <p id="result"></p>
+
   <script>
     Telegram.WebApp.ready();
 
     const urlParams = new URLSearchParams(window.location.search);
     const amount = urlParams.get("amount") || "500";
 
-    // Обновление текста кнопки при загрузке
     document.addEventListener("DOMContentLoaded", () => {
       const btn = document.getElementById("pay-btn");
       if (btn) {
@@ -47,16 +54,34 @@
       }
     });
 
-    // Переход к оплате
     function pay() {
       const payUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Оплата+услуг&default-sum=${amount}&button-text=11&payment-type-choice=on&account=4100119123765834`;
       window.open(payUrl, "_blank");
     }
 
-    // Обновление WebApp вручную
     function reload() {
       location.reload();
     }
+
+    async function startScanner() {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices.length > 0) {
+        const cameraId = devices[0].id;
+        const qr = new Html5Qrcode("reader");
+        qr.start(
+          cameraId,
+          { fps: 10, qrbox: 250 },
+          decodedText => {
+            document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
+            window.open(decodedText, "_blank");
+            qr.stop();
+          },
+          error => {}
+        );
+      }
+    }
+
+    startScanner();
   </script>
 </body>
 </html>
