@@ -66,6 +66,22 @@
     function reload() {
       location.reload();
     }
+<select id="camera-select"></select>
+<button onclick="startScanner()">📸 Включить сканер</button>
+
+<script>
+  let qr;
+
+  async function loadCameras() {
+    const devices = await Html5Qrcode.getCameras();
+    const select = document.getElementById("camera-select");
+    devices.forEach(device => {
+      const option = document.createElement("option");
+      option.value = device.id;
+      option.text = device.label || `Камера ${select.length + 1}`;
+      select.appendChild(option);
+    });
+  }
 
     async function startScanner() {
       const reader = document.getElementById("reader");
