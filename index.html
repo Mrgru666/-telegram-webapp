@@ -13,18 +13,15 @@
       padding: 20px;
       background-color: #f9f9f9;
     }
-    button {
+    button, select {
       font-size: 18px;
       padding: 12px 24px;
-      margin: 20px 0;
+      margin: 10px 0;
       background-color: #30a14e;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-    }
-    button:hover {
-      background-color: #228c3a;
     }
     #reader {
       margin-top: 20px;
@@ -36,9 +33,13 @@
 </head>
 <body>
   <h1>Аренда кемпинга</h1>
+
   <button onclick="pay()">💳 Оплатить 500 ₽</button>
 
-  <h2 style="margin-top: 40px;">Или отсканируйте QR-код:</h2>
+  <h2>Выберите камеру:</h2>
+  <select id="camera-select"></select>
+  <button onclick="startScanner()">📷 Включить сканер</button>
+
   <div id="reader"></div>
   <p id="result"></p>
 
@@ -50,36 +51,35 @@
       window.open(payUrl, "_blank");
     }
 
-    async function startScanner() {
+    let html5Qr;
+
+    async function loadCameras() {
       const devices = await Html5Qrcode.getCameras();
-      if (!devices || devices.length === 0) {
-        alert("Камеры не найдены");
-        return;
-      }
+      const select = document.getElementById("camera-select");
+      devices.forEach(device => {
+        const option = document.createElement("option");
+        option.value = device.id;
+        option.text = device.label || `Камера ${select.length + 1}`;
+        select.appendChild(option);
+      });
+    }
 
-      const backCamera = devices.find(d =>
-        d.label.toLowerCase().includes("back") ||
-        d.label.toLowerCase().includes("rear") ||
-        d.label.toLowerCase().includes("environment")
-      ) || devices[0];
-
-      const qr = new Html5Qrcode("reader");
-
-      qr.start(
-        backCamera.id,
+    async function startScanner() {
+      const cameraId = document.getElementById("camera-select").value;
+      html5Qr = new Html5Qrcode("reader");
+      await html5Qr.start(
+        cameraId,
         { fps: 10, qrbox: 250 },
         decodedText => {
           document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
           window.open(decodedText, "_blank");
-          qr.stop();
+          html5Qr.stop();
         },
-        error => {
-          // Ошибки сканирования можно логировать
-        }
+        error => {}
       );
     }
 
-    startScanner();
+    loadCameras(); // загрузим список камер при загрузке страницы
   </script>
 </body>
 </html>
