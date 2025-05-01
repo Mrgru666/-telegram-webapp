@@ -23,11 +23,15 @@
       border-radius: 10px;
       cursor: pointer;
     }
+    button:hover {
+      background-color: #228c3a;
+    }
     #reader {
       margin-top: 20px;
       width: 300px;
       margin-left: auto;
       margin-right: auto;
+      display: none;
     }
   </style>
 </head>
@@ -36,8 +40,8 @@
 
   <button id="pay-btn" onclick="pay()">💳 Оплатить</button>
   <button onclick="reload()">🔄 Обновить WebApp</button>
+  <button onclick="startScanner()">📸 Оплатить по QR</button>
 
-  <h2>Или отсканируйте QR-код:</h2>
   <div id="reader"></div>
   <p id="result"></p>
 
@@ -64,10 +68,14 @@
     }
 
     async function startScanner() {
+      const reader = document.getElementById("reader");
+      reader.style.display = "block";
+
       const devices = await Html5Qrcode.getCameras();
       if (devices.length > 0) {
         const cameraId = devices[0].id;
         const qr = new Html5Qrcode("reader");
+
         qr.start(
           cameraId,
           { fps: 10, qrbox: 250 },
@@ -80,8 +88,6 @@
         );
       }
     }
-
-    startScanner();
   </script>
 </body>
 </html>
