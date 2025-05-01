@@ -5,6 +5,7 @@
   <title>Оплаты вашей темки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -30,18 +31,38 @@
   </style>
 </head>
 <body>
+ <body>
   <h1>Аренда кемпинга</h1>
   <p>Нажми кнопку ниже, чтобы перейти к оплате:</p>
   <button onclick="pay()">💳 Оплатить 500 ₽</button>
 
+  <h2 style="margin-top: 40px;">Или отсканируй QR-код:</h2>
+  <div id="reader" style="width: 300px; margin: auto;"></div>
+  <p id="scan-result"></p>
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script>
     Telegram.WebApp.ready();
 
     function pay() {
-      // Вставь сюда свою ссылку на оплату (например, от YooMoney)
       const payUrl = "https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Аренда+кемпинга&default-sum=500&button-text=11&payment-type-choice=on&account=4100119123765834";
       window.open(payUrl, "_blank");
-      Telegram.WebApp.close(); // Закроет WebApp после нажатия
+      Telegram.WebApp.close();
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("scan-result").innerText = "📦 QR найден: " + decodedText;
+      window.open(decodedText, "_blank");
+      html5QrcodeScanner.clear();
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+      fps: 10,
+      qrbox: 250
+    });
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
+</body>
     }
   </script>
 </body>
