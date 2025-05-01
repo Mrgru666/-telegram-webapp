@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Оплаты вашей темки</title>
+  <title>Аренда кемпинга</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -10,15 +10,13 @@
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 30px;
+      padding: 20px;
       background-color: #f2f2f2;
-    }
-    h1 {
-      margin-bottom: 20px;
     }
     button {
       font-size: 18px;
-      padding: 15px 25px;
+      padding: 12px 24px;
+      margin: 20px 0;
       background-color: #30a14e;
       color: white;
       border: none;
@@ -26,60 +24,58 @@
       cursor: pointer;
     }
     button:hover {
-      background-color: #228c3a;
+      background-color: #21843d;
+    }
+    #reader {
+      margin-top: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
- <body>
   <h1>Аренда кемпинга</h1>
-  <p>Нажми кнопку ниже, чтобы перейти к оплате:</p>
+
   <button onclick="pay()">💳 Оплатить 500 ₽</button>
 
-  <h2 style="margin-top: 40px;">Или отсканируй QR-код:</h2>
-  <div id="reader" style="width: 300px; margin: auto;"></div>
+  <h2>Или отсканируйте QR-код:</h2>
+  <div id="reader"></div>
   <p id="scan-result"></p>
 
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script>
-    <script>
-  Telegram.WebApp.ready();
+    Telegram.WebApp.ready();
 
-  function pay() {
-    const payUrl = "https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Аренда+кемпинга&default-sum=500&button-text=11&payment-type-choice=on&account=4100119123765834";
-    window.open(payUrl, "_blank");
-    Telegram.WebApp.close();
-  }
-
-  async function startScanner() {
-    const devices = await Html5Qrcode.getCameras();
-    if (devices && devices.length > 0) {
-      const backCamera = devices.find(d => d.label.toLowerCase().includes('back')) || devices[0];
-      const html5Qr = new Html5Qrcode("reader");
-      html5Qr.start(
-        backCamera.id,
-        {
-          fps: 10,
-          qrbox: 250
-        },
-        (decodedText, decodedResult) => {
-          document.getElementById("scan-result").innerText = "📦 QR найден: " + decodedText;
-          window.open(decodedText, "_blank");
-          html5Qr.stop();
-        },
-        (errorMessage) => {
-          // Ошибки можно скрыть или отобразить
-        }
-      );
-    } else {
-      alert("Камера не найдена");
+    function pay() {
+      const payUrl = "https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Аренда+кемпинга&default-sum=500&button-text=11&payment-type-choice=on&account=4100119123765834";
+      window.open(payUrl, "_blank");
+      // Telegram.WebApp.close(); // можешь вернуть, если нужно закрытие
     }
-  }
 
-  startScanner(); // Запуск камеры при открытии
-</script>
-</body>
+    async function startScanner() {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length > 0) {
+        const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+        const html5Qr = new Html5Qrcode("reader");
+
+        html5Qr.start(
+          backCam.id,
+          { fps: 10, qrbox: 250 },
+          (decodedText, decodedResult) => {
+            document.getElementById("scan-result").innerText = "📦 QR найден: " + decodedText;
+            window.open(decodedText, "_blank");
+            html5Qr.stop();
+          },
+          errorMessage => {
+            // Можно логировать ошибки при сканировании
+          }
+        );
+      } else {
+        alert("Камера не найдена");
+      }
     }
+
+    startScanner();
   </script>
 </body>
 </html>
