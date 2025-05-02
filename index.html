@@ -69,44 +69,44 @@
 
     let qrInstance;
 
-  document.getElementById("qr-btn").onclick = async () => {
-    const select = document.getElementById("camera-select");
-    const startBtn = document.getElementById("start-scan");
+    document.getElementById("qr-btn").onclick = async () => {
+      const select = document.getElementById("camera-select");
+      const startBtn = document.getElementById("start-scan");
 
-  const devices = await Html5Qrcode.getCameras();
-  if (!devices || devices.length === 0) {
-    alert("Камера не найдена");
-    return;
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || devices.length === 0) {
+      alert("Камера не найдена");
+      return;
   }
 
   // Очистить список, если был
-  select.innerHTML = "";
+    select.innerHTML = "";
 
-  devices.forEach(device => {
-    const option = document.createElement("option");
+    devices.forEach(device => {
+      const option = document.createElement("option");
     option.value = device.id;
     option.text = device.label || `Камера ${select.length + 1}`;
     select.appendChild(option);
   });
 
-  select.style.display = "inline-block";
-  startBtn.style.display = "inline-block";
+    select.style.display = "inline-block";
+    startBtn.style.display = "inline-block";
 };
 
-  document.getElementById("start-scan").onclick = async () => {
-    const selectedCamId = document.getElementById("camera-select").value;
-    const reader = document.getElementById("reader");
+    document.getElementById("start-scan").onclick = async () => {
+      const selectedCamId = document.getElementById("camera-select").value;
+      const reader = document.getElementById("reader");
     reader.style.display = "block";
 
-  qrInstance = new Html5Qrcode("reader");
+    qrInstance = new Html5Qrcode("reader");
 
-  await qrInstance.start(
-    selectedCamId,
-    { fps: 10, qrbox: 250 },
-    decodedText => {
-      document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
-      window.open(decodedText, "_blank");
-      qrInstance.stop();
+    await qrInstance.start(
+      selectedCamId,
+      { fps: 10, qrbox: 250 },
+      decodedText => {
+    document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
+    window.open(decodedText, "_blank");
+    qrInstance.stop();
     },
     error => {}
   );
