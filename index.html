@@ -44,74 +44,71 @@
   <p id="result"></p>
 
   <script>
-    Telegram.WebApp.ready();
+  Telegram.WebApp.ready();
 
-    let amount = "500";
-    let qrInstance;
+  let amount = "500";
+  let qrInstance;
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      const params = new URLSearchParams(window.location.search);
-      amount = params.get("amount") || "500";
-
-      const payBtn = document.getElementById("pay-btn");
-      payBtn.textContent = `💳 Оплатить ${amount} ₽`;
-      payBtn.onclick = pay;
-    });
-
-    function pay() {
-      const payUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Оплата+услуг&default-sum=${amount}&button-text=11&payment-type-choice=on&account=4100119123765834`;
-      window.open(payUrl, "_blank");
-    }
-
-    function reload() {
-      location.reload();
-    }
-
-    let qrInstance;
-
-    document.getElementById("qr-btn").onclick = async () => {
-      const select = document.getElementById("camera-select");
-      const startBtn = document.getElementById("start-scan");
-
-      const devices = await Html5Qrcode.getCameras();
-      if (!devices || devices.length === 0) {
-      alert("Камера не найдена");
-      return;
+  function pay() {
+    const payUrl = `https://yoomoney.ru/quickpay/shop-widget?writer=seller&targets=Оплата+услуг&default-sum=${amount}&button-text=11&payment-type-choice=on&account=4100119123765834`;
+    window.open(payUrl, "_blank");
   }
 
-  // Очистить список, если был
-    select.innerHTML = "";
+  function reload() {
+    location.reload();
+  }
 
+  async function setupCameraSelection() {
+    const select = document.getElementById("camera-select");
+    const startBtn = document.getElementById("start-scan");
+
+    const devices = await Html5Qrcode.getCameras();
+    if (!devices || devices.length === 0) {
+      alert("Камера не найдена");
+      return;
+    }
+
+    select.innerHTML = "";
     devices.forEach(device => {
       const option = document.createElement("option");
-    option.value = device.id;
-    option.text = device.label || `Камера ${select.length + 1}`;
-    select.appendChild(option);
-  });
+      option.value = device.id;
+      option.text = device.label || `Камера ${select.length + 1}`;
+      select.appendChild(option);
+    });
 
     select.style.display = "inline-block";
     startBtn.style.display = "inline-block";
-};
+  }
 
-    document.getElementById("start-scan").onclick = async () => {
-      const selectedCamId = document.getElementById("camera-select").value;
-      const reader = document.getElementById("reader");
+  async function startScanner() {
+    const selectedCamId = document.getElementById("camera-select").value;
+    const reader = document.getElementById("reader");
     reader.style.display = "block";
 
     qrInstance = new Html5Qrcode("reader");
-
     await qrInstance.start(
       selectedCamId,
       { fps: 10, qrbox: 250 },
       decodedText => {
-    document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
-    window.open(decodedText, "_blank");
-    qrInstance.stop();
-    },
-    error => {}
-  );
-};
-    }
-  </script>
+        document.getElementById("result").innerText = "📦 QR найден: " + decodedText;
+        window.open(decodedText, "_blank");
+        qrInstance.stop();
+      },
+      error => {}
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    amount = params.get("amount") || "500";
+
+    const payBtn = document.getElementById("pay-btn");
+    payBtn.textContent = `💳 Оплатить ${amount} ₽`;
+    payBtn.onclick = pay;
+
+    document.getElementById("qr-btn").onclick = setupCameraSelection;
+    document.getElementById("start-scan").onclick = startScanner;
+  });
+</script>
 </body>
 </html>
