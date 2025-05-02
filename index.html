@@ -36,7 +36,9 @@
 
   <button id="pay-btn">💳 Оплатить</button>
   <button onclick="reload()">🔄 Обновить WebApp</button>
-  <button onclick="startScanner()">📸 Оплатить по QR</button>
+  <button id="qr-btn">📸 Оплатить по QR</button>
+  <select id="camera-select" style="display:none;"></select>
+  <button id="start-scan" style="display:none;">▶️ Начать сканирование</button>
 
   <div id="reader"></div>
   <p id="result"></p>
